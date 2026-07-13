@@ -76,7 +76,7 @@ Change some parameters in the [config.py](./src/config.py) file,
 such as `CALIB_EPISODES`, the number of calibration episodes to run
 and `TEST_EPISODES`, the number of test episodes to run.
 
-Change the `OUTPUT_DIR` to a convinient path, and start the simulation by running:
+Change the `OUTPUT_DIR` to a convenient path, and start the simulation by running:
 
 ```sh
 python main.py

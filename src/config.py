@@ -8,13 +8,15 @@ ENSEMBLE_MODE = False
 
 # The base chronic is important. This value represents
 # from when the simulation starts.
-# If the forecaster was trained on the first k episdoes
+# If the forecaster was trained on the first k episodes
 # then we must set BASE_CHRONIC = k to ensure data independence
 BASE_CHRONIC = 900
+
 # number of episodes from which we collect the
 # calibration dataset. For example, if BASE_CHRONIC = 900 and
 # CALIB_EPISODES = 30, then we collect data from episode 901 to 930
 CALIB_EPISODES = 30
+
 # number of test episodes. They execute after the calibration, for example
 # if BASE_CHRONIC = 900, and CALIB_EPISODES = 30 and TEST_EPISODES = 30,
 # then the test episodes are 931 to 960
@@ -171,7 +173,7 @@ FORECASTER_MODULE = "forecasters.hbgb_14"
 # Environment details
 # changing the environment requires that both the agent
 # and forecaster are also changed. For the forecaster,
-# the perform_forecast fucntion must be implemented
+# the perform_forecast function must be implemented
 BASE_ENV_SEED = 2000 + 42
 
 

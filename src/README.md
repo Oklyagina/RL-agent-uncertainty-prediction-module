@@ -3,7 +3,7 @@
 A framework for using CP (Conformal Prediction) models to provide intervals of uncertainty around point
 forecasts in Grid2Op.
 
-Adittionally provides the implementation of a STL (Signal Temporal Logic) rule. See [STL README](./stl_rules/README.md).
+Additionally provides the implementation of a STL (Signal Temporal Logic) rule. See [STL README](./stl_rules/README.md).
 
 ## Overview
 
@@ -104,7 +104,7 @@ Configuration is done through `config.py`. The main parameters are:
 
 - `IGNORE_CACHE_CALIBRATION` - Allows to ignore calibration episodes, overwriting them with new data.
 
-- `IGNORE_CACHE_MODELS` - Allows to ignore trained models (if they exists in the conditions) and overwritting them once a new training finishes.
+- `IGNORE_CACHE_MODELS` - Allows to ignore trained models (if they exist in the conditions) and overwriting them once a new training finishes.
 
 - `MODELS` - which conformal models to enable
 
@@ -129,7 +129,7 @@ Configuration is done through `config.py`. The main parameters are:
 Results are saved to `OUTPUT_DIR`, and plots are automatically generated if `AUTO_GEN_PLOTS` is enabled.
 If `AUTO_GEN_PLOTS` is disabled, the plots can still be generated. Check `plotting/` folder.
 
-There are more paramenters in this file, that must be changed in order to change the simulation.
+There are more parameters in this file that must be changed in order to change the simulation.
 
 When configuration is chosen, we save it and run the following command:
 
