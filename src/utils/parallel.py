@@ -136,7 +136,7 @@ def model_training_worker(
             alpha=alpha,
         )
 
-        if model is not None:
+        if model is not None and model.is_trained():
             # we save the model after training
             print(f"  {model_name}: Training complete, saving to cache...")
             data_manager.save_model(model_name, n_episodes, model, alpha)
@@ -144,7 +144,7 @@ def model_training_worker(
                 model_name=model_name, trained_model=model, success=True
             )
         else:
-            print(f"  {model_name}: failed to create")
+            print(f"  {model_name}: failed to create a trained predictor")
             return ModelTrainingWorkerReturn(
                 model_name=model_name, trained_model=None, success=False
             )

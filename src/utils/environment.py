@@ -8,6 +8,7 @@ from lightsim2grid import LightSimBackend
 
 import config
 from curriculumagent.baseline.baseline import CurriculumAgent
+from utils.global_utils import resolve_config_path
 
 
 # NOTE: When creating with another agent/forecasting model
@@ -56,7 +57,7 @@ def create_environment(
         observation_space=env.observation_space,
         name=config.AGENT_NAME,
     )
-    agent.load(config.MODEL_PATH)
+    agent.load(resolve_config_path(config.MODEL_PATH))
 
     return env, agent
 
