@@ -72,11 +72,36 @@ For more information, consult each folders README.
 
 With the conda environment activated, we can move to the [src](./src/) folder.
 
-Change some parameters in the [config.py](./src/config.py) file,
-such as `CALIB_EPISODES`, the number of calibration episodes to run
-and `TEST_EPISODES`, the number of test episodes to run.
+The default command uses the full configuration from [config_full.py](./src/config_full.py):
 
-Change the `OUTPUT_DIR` to a convenient path, and start the simulation by running:
+```sh
+python main.py
+```
+
+For a quick end-to-end smoke test, use [config_smoke.py](./src/config_smoke.py):
+
+```sh
+python main.py --config smoke
+```
+
+You can also select the smoke configuration with an environment variable:
+
+```sh
+CP_CONFIG=smoke python main.py
+```
+
+In PowerShell, use:
+
+```powershell
+$env:CP_CONFIG = "smoke"
+python main.py
+```
+
+Both configuration files are plain Python. Paths such as `OUTPUT_DIR`, `MODEL_PATH`, and
+`FORECASTER_PATH` are resolved relative to the `src` configuration directory.
+
+If needed, change parameters such as `CALIB_EPISODES`, `TEST_EPISODES`, and `OUTPUT_DIR`
+in the selected configuration file, then start the simulation by running:
 
 ```sh
 python main.py
