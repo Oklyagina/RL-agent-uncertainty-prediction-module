@@ -1,4 +1,9 @@
-from utils.global_utils import ensure_dir, get_env_details, ignore_warnings
+from utils.global_utils import (
+    ensure_dir,
+    get_env_details,
+    ignore_warnings,
+    resolve_config_path,
+)
 
 ignore_warnings()
 
@@ -36,7 +41,7 @@ def run_conformal_simulation(
 
     # Setup output directory
     ensure_dir(output_dir)
-    ensure_dir(config.CALIBRATION_CACHE_DIR)
+    ensure_dir(resolve_config_path(config.CALIBRATION_CACHE_DIR))
 
     # Get environment info and validate configuration
     n_lines, line_names = get_env_details()
@@ -94,13 +99,14 @@ def run_all_alphas(all_alphas: list[float]) -> None:
         all_alphas: List of floats each representing one alpha for which we want to run the simulation
     """
     start_time = time.time()
+    output_root = resolve_config_path(config.OUTPUT_DIR)
 
     for alpha in all_alphas:
         print(f"now running alpha={alpha}")
 
         # we create alpha_* folder (it's important not to change this name because
         # it is used for aggregation)
-        output_dir = os.path.join(config.OUTPUT_DIR, f"alpha_{alpha}")
+        output_dir = os.path.join(output_root, f"alpha_{alpha}")
 
         run_conformal_simulation(
             alpha=alpha,
@@ -109,7 +115,7 @@ def run_all_alphas(all_alphas: list[float]) -> None:
 
     # starts all plots if they are to be generated during simulation
     if config.AUTO_GEN_PLOTS:
-        start_all_plots(config.OUTPUT_DIR)
+        start_all_plots(output_root)
 
     total_time = (time.time() - start_time) / 60
     print(f"Simulation is finished. Took: {total_time:.2f} minutes")
