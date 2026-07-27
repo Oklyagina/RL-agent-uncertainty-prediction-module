@@ -15,7 +15,7 @@ def _select_config_from_cli() -> None:
     Reads --config before importing config-dependent modules.
     """
     parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument("--config", choices=("full", "smoke"), default=None)
+    parser.add_argument("--config", choices=("full", "smoke"), default="full")
     args, remaining = parser.parse_known_args()
 
     if args.config is not None:
