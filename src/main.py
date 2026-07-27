@@ -138,6 +138,8 @@ def run_all_alphas(all_alphas: list[float]) -> None:
 
     total_time = (time.time() - start_time) / 60
     print(f"Simulation is finished. Took: {total_time:.2f} minutes")
+    print("Simulation completed successfully.")
+    print(f"Results were saved in: {output_root}")
 
 
 if __name__ == "__main__":

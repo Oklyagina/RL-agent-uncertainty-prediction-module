@@ -259,6 +259,22 @@ def run_parallel_jobs(
     results = []
     successful = 0
 
+    if max_workers <= 1:
+        with tqdm(total=len(job_args_list), desc=desc, unit="job") as pbar:
+            for job_args in job_args_list:
+                try:
+                    result = worker_func(job_args)
+                    successful += 1
+                    results.append(result)
+                except Exception as e:
+                    print(f"Job failed: {e}")
+
+                pbar.update(1)
+
+        gc.collect()
+        print(f"Parallel jobs completed: {successful}/{len(job_args_list)} successful")
+        return results
+
     with mp.Pool(processes=max_workers, maxtasksperchild=1) as pool:
         with tqdm(total=len(job_args_list), desc=desc, unit="job") as pbar:
             for result in pool.imap_unordered(worker_func, job_args_list):
