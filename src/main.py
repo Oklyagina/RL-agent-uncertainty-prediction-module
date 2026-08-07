@@ -15,7 +15,7 @@ def _select_config_from_cli() -> None:
     Reads --config before importing config-dependent modules.
     """
     parser = argparse.ArgumentParser(add_help=False)
-    parser.add_argument("--config", choices=("full", "smoke"), default=None)
+    parser.add_argument("--config", choices=("full", "smoke"), default="full")
     args, remaining = parser.parse_known_args()
 
     if args.config is not None:
@@ -138,6 +138,8 @@ def run_all_alphas(all_alphas: list[float]) -> None:
 
     total_time = (time.time() - start_time) / 60
     print(f"Simulation is finished. Took: {total_time:.2f} minutes")
+    print("Simulation completed successfully.")
+    print(f"Results were saved in: {output_root}")
 
 
 if __name__ == "__main__":

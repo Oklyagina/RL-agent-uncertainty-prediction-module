@@ -1,0 +1,17 @@
+services:
+  app:
+    build:
+      context: .
+    image: grid2op-cp:local
+    environment:
+      CP_CONFIG: ${CP_CONFIG:-smoke}
+      OMP_NUM_THREADS: ${OMP_NUM_THREADS:-1}
+      CUDA_VISIBLE_DEVICES: ${CUDA_VISIBLE_DEVICES:--1}
+    volumes:
+      - ./docker-output:/app/src/RESULTS
+      - ./docker-cache:/app/src/CACHE
+      - grid2op-data:/home/appuser/data_grid2op
+    restart: "no"
+
+volumes:
+  grid2op-data:
