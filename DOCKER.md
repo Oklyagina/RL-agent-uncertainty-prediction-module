@@ -28,19 +28,45 @@ The default `.env.example` uses `CP_CONFIG=smoke`, which is the recommended firs
 
 After the image has been built once, you usually do not need to rebuild it.
 
-Run the existing Compose service again:
+Run the existing Compose service again in Windows PowerShell:
 
-```
+```powershell
 docker compose up
 ```
 
 Use `--build` only when Docker-related files, `requirements.txt`, or project files that are copied into the image have changed:
 
-```bash
+```powershell
 docker compose up --build
 ```
 
 If the previous container exists, Docker Compose will reuse the existing service definition, mounted folders, and named Grid2Op data volume. The container may be recreated when needed, but `docker-output/`, `docker-cache/`, and the `grid2op-data` volume are preserved.
+
+To run a different configuration without editing `.env`, start a one-off Compose run:
+
+```powershell
+docker compose run --rm -e CP_CONFIG=full app python main.py --config full
+```
+
+To run the smoke test again:
+
+```powershell
+docker compose run --rm -e CP_CONFIG=smoke app python main.py --config smoke
+```
+
+`docker compose exec ...` sends a command into a container that is already running. This project is a batch simulation: it starts, runs one simulation, writes results, and exits. Because of that, `docker compose run --rm ...` is usually the right command when you want to run the project again with different settings.
+
+## Change Forecasting Mode or Data
+
+If the mode you need is already represented by `smoke` or `full`, use `CP_CONFIG` and `--config` as shown above.
+
+If you need a different Grid2Op environment, agent, or forecaster, add or edit a Python configuration file first, then run Docker with that configuration. The environment, agent, model path, forecaster class, and forecaster path are application settings, so Docker should launch the chosen config rather than modify those values inside an already running process.
+
+Keep these mounts active so repeated Docker runs reuse the same generated data:
+
+- `/app/src/RESULTS` for result files
+- `/app/src/CACHE` for calibration/model cache files
+- `/home/appuser/data_grid2op` for downloaded Grid2Op environment data
 
 ## Outputs and Cache
 
@@ -159,6 +185,7 @@ git lfs pull
 
 - `Required artifact is missing`: fetch Git LFS files, then rebuild.
 - `Unknown CP_CONFIG`: set `CP_CONFIG=smoke` or `CP_CONFIG=full`.
+- `COPY docker/entrypoint.sh ... not found`: use the current `Dockerfile`, where the entrypoint is embedded during build. If you still see this error, the other machine has an older copy of the Docker files.
 - Permission errors in `docker-output` or `docker-cache`: remove the local mounted folder and let Docker recreate it, or fix ownership/permissions on the host.
 - Grid2Op environment errors: keep the `grid2op-data` Docker volume so downloaded environment data persists across runs.
 - Very slow startup: confirm `.env` still uses `CP_CONFIG=smoke` for validation.
