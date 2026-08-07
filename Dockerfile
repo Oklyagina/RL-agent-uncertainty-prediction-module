@@ -66,7 +66,8 @@ exec "$@"
 SCRIPT
 EOF
 
-RUN chown -R appuser:appuser /app/src/RESULTS /app/src/CACHE \
+RUN sed -i 's/\r$//' /usr/local/bin/project-entrypoint \
+    && chown -R appuser:appuser /app/src/RESULTS /app/src/CACHE \
     && chmod +x /usr/local/bin/project-entrypoint
 
 USER appuser
