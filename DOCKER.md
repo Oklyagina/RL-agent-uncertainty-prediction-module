@@ -187,6 +187,7 @@ git lfs pull
 - `Unknown CP_CONFIG`: set `CP_CONFIG=smoke` or `CP_CONFIG=full`.
 - `COPY docker/entrypoint.sh ... not found`: use the current `Dockerfile`, where the entrypoint is embedded during build. If you still see this error, the other machine has an older copy of the Docker files.
 - `No matching distribution found for setuptools==69.5.1`: use the current `requirements.txt`, which accepts newer compatible `setuptools` versions when the package index does not provide that exact older release.
+- `/usr/bin/env: 'bash\r': No such file or directory`: rebuild with the current `Dockerfile`. It normalizes the generated entrypoint to Unix line endings during the image build.
 - Permission errors in `docker-output` or `docker-cache`: remove the local mounted folder and let Docker recreate it, or fix ownership/permissions on the host.
 - Grid2Op environment errors: keep the `grid2op-data` Docker volume so downloaded environment data persists across runs.
 - Very slow startup: confirm `.env` still uses `CP_CONFIG=smoke` for validation.
