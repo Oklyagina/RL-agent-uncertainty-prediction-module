@@ -1,4 +1,4 @@
-setuptools>=69.5.1
+setuptools>=69.5.1,<81
 pyarrow==14.0.1
 pydantic==1.10.26
 typer==0.9.4
