@@ -2,6 +2,13 @@
 
 This project runs conformal-prediction simulations for Grid2Op power-grid environments. The recommended way to run it is with Docker, because Docker installs the Python dependencies inside a reproducible Linux image and keeps generated results outside the image.
 
+## Quick links
+
+- [Setup using Docker](#running-project-with-docker)
+  - [Troubleshoot](#docker-troubleshooting)
+- [Setup using Conda](#running-project-using-conda-without-docker)
+- [Project Structure](#project-structure)
+
 ## Running Project With Docker
 
 ### Prerequisites
@@ -15,14 +22,11 @@ On Windows, make sure the `C:` drive has at least 10 GB of free space for the Do
 Install Git LFS before building the Docker image. Git LFS is required because the `.pkl` model files are stored as large files:
 
 ```powershell
-winget install GitHub.GitLFS
 git lfs install
 git lfs pull
 ```
 
 On Windows, you can also download the installer from the [Git LFS website](https://git-lfs.com/).
-
-`HBGB_14.pkl` is stored with Git LFS. If Git LFS files are not pulled, the repository contains only a tiny pointer file, and Docker will copy that pointer into the image instead of the real model. If you run `git lfs pull` after a failed Docker build, rebuild the image.
 
 ### First Docker Run
 
@@ -44,7 +48,27 @@ Start the smoke test:
 docker compose up --build
 ```
 
-The default `.env.example` uses `CP_CONFIG=smoke`, which is the recommended first run. The full configuration can be much slower and heavier.
+The default `.env.example` uses `CP_CONFIG=smoke`, which is the recommended first run. 
+The full configuration can be much slower and heavier.
+
+### Choose Where Docker Saves Results
+
+Docker runs Python inside the container, so the final message prints a container path such as:
+
+```text
+Results were saved in: /app/src/RESULTS/SMOKE_TEST
+```
+
+That folder is mounted to a normal folder on your computer. By default, the host folder is `results/`.
+To choose a different host folder, edit `.env`.
+
+
+You can also choose where cache files are stored (keeping the cache folder between runs can save time on docker mounting):
+
+```env
+HOST_CACHE_DIR=F:/grid2op-cache
+```
+
 
 ### Reuse an Existing Docker Setup
 
@@ -56,11 +80,7 @@ Run the existing Compose service again:
 docker compose up
 ```
 
-Use `--build` only when Docker-related files, `requirements.txt`, or project files copied into the image have changed:
-
-```powershell
-docker compose up --build
-```
+Use `--build` only when Docker-related files, `requirements.txt`, or project files copied into the image have changed.
 
 To run a different configuration without editing `.env`, start a one-off Compose run:
 
@@ -74,20 +94,39 @@ To run the smoke test again:
 docker compose run --rm -e CP_CONFIG=smoke app python main.py --config smoke
 ```
 
-`docker compose exec ...` sends a command into a container that is already running. This project is a batch simulation: it starts, runs one simulation, writes results, and exits. Because of that, `docker compose run --rm ...` is usually the right command when you want to run the project again with different settings.
+### Run Manual Commands Inside Docker
 
+You can open a temporary shell inside the Docker environment. This uses the already built image, installed Python dependencies, and mounted results/cache folders:
+
+```powershell
+docker compose run --rm app bash
+```
+
+Inside that shell, run the project just like you would in a normal command line:
+
+```bash
+python main.py --config smoke
+python main.py --config full
+```
+
+Leave the shell with:
+
+```bash
+exit
+```
+
+This is useful when you want to try different existing commands without rebuilding the image. If you edit Python files on the host, rebuild the image before expecting Docker to use those code changes. 
 ### Change Forecasting Mode Or Data
 
 If the mode you need is already represented by `smoke` or `full`, use `CP_CONFIG` and `--config` as shown above.
 
-If you need a different Grid2Op environment, agent, or forecaster, add or edit a Python configuration file first, then run Docker with that configuration. The environment, agent, model path, forecaster class, and forecaster path are application settings, so Docker should launch the chosen config rather than modify those values inside an already running process.
-
+If you need a different Grid2Op environment, agent, or forecaster, add or edit a Python configuration file first, then run Docker with that configuration. 
 ### Docker Outputs And Cache
 
 Runtime files are written outside the image:
 
-- `docker-output/` is mounted to `/app/src/RESULTS`
-- `docker-cache/` is mounted to `/app/src/CACHE`
+- `HOST_RESULTS_DIR` from `.env` is mounted to `/app/src/RESULTS`
+- `HOST_CACHE_DIR` from `.env` is mounted to `/app/src/CACHE`
 - the named Docker volume `grid2op-data` stores Grid2Op environment data under `/home/appuser/data_grid2op`
 
 Logs are written to standard output and standard error:
@@ -118,30 +157,7 @@ Use this only when you intentionally want Docker to forget downloaded Grid2Op en
 docker compose down --volumes
 ```
 
-Do not delete `docker-output/` unless you no longer need the generated results. Do not delete `docker-cache/` unless you want future runs to recompute cached calibration/model data.
-
-### Full Docker Experiment
-
-Edit `.env`:
-
-```env
-CP_CONFIG=full
-```
-
-Then run:
-
-```powershell
-docker compose up --build
-```
-
-You can also set the full configuration for one PowerShell session without editing `.env`:
-
-```powershell
-$env:CP_CONFIG = "full"
-docker compose up --build
-```
-
-### Docker Required Artifacts
+### Docker Troubleshooting
 
 The default smoke/full case-14 configuration expects these files to exist before the image is built:
 
@@ -162,10 +178,10 @@ After fetching Git LFS files, rebuild the Docker image:
 docker compose up --build
 ```
 
-### Docker Troubleshooting
+Possible issues and solutions:
 
 - `Required artifact is missing`: fetch Git LFS files, then rebuild.
-- `HBGB_14.pkl appears to be a Git LFS pointer`: run `git lfs install`, `git lfs pull`, `docker compose down`, then `docker compose up --build`.
+- `HBGB_14.pkl appears to be a Git LFS pointer`: from the project folder, run `git lfs install`, `git lfs pull`, `docker compose down`, then `docker compose up --build`.
 - `Unknown CP_CONFIG`: set `CP_CONFIG=smoke` or `CP_CONFIG=full`.
 - `read-only file system` while Docker is committing a build layer: check free space on the Windows `C:` drive. Docker Desktop stores its image/build data there by default and this project needs at least 10 GB free for the image and app data together.
 - Permission errors in `docker-output` or `docker-cache`: remove the local mounted folder and let Docker recreate it, or fix ownership/permissions on the host.
@@ -174,21 +190,11 @@ docker compose up --build
 
 ## Running Project Using Conda (without Docker)
 
-Use this path only if you want to run the project directly on the host machine.
+Use this path only if you want to run the project directly on the host machine. 
 
 ### Clone And Fetch Model Files
 
-Install Git LFS to download the `.pkl` models:
-
-```sh
-brew install git-lfs          # macOS (using brew)
-sudo pacman -S git-lfs        # Arch
-sudo dnf install git-lfs      # Fedora
-sudo apt-get install git-lfs  # Ubuntu
-winget install GitHub.GitLFS  # Windows PowerShell
-```
-
-Initialize Git LFS:
+Install Git LFS to download the `.pkl` models. From the project folder, run:
 
 ```sh
 git lfs install

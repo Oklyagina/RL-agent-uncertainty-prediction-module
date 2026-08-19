@@ -8,9 +8,15 @@ services:
       OMP_NUM_THREADS: ${OMP_NUM_THREADS:-1}
       CUDA_VISIBLE_DEVICES: ${CUDA_VISIBLE_DEVICES:--1}
     volumes:
-      - ./docker-output:/app/src/RESULTS
-      - ./docker-cache:/app/src/CACHE
-      - grid2op-data:/home/appuser/data_grid2op
+      - type: bind
+        source: ${HOST_RESULTS_DIR:-./docker-output}
+        target: /app/src/RESULTS
+      - type: bind
+        source: ${HOST_CACHE_DIR:-./docker-cache}
+        target: /app/src/CACHE
+      - type: volume
+        source: grid2op-data
+        target: /home/appuser/data_grid2op
     restart: "no"
 
 volumes:
